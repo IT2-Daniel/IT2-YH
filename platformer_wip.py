@@ -21,6 +21,10 @@ enemy_range=300
 IFrames=0
 spawnX=100
 spawnY=500
+enemy_hp=2
+bullet_speed=500
+bullet_dir=1
+bullet=pg.Rect(player.centerx,player.centery,50,15)
 
 
 platforms = [
@@ -34,9 +38,9 @@ platforms = [
 ]
 
 enemies=[
-    {"pos":pg.Vector2(825,400),"rect":pg.Rect(0,0,80,80), "start":825,"dir":1},
-    {"pos":pg.Vector2(2200,350),"rect":pg.Rect(0,0,80,80), "start":2200,"dir":1},
-    {"pos":pg.Vector2(3250,400),"rect":pg.Rect(0,0,80,80),"start":3250,"dir":1}
+    {"pos":pg.Vector2(825,400),"rect":pg.Rect(0,0,40,40), "start":825,"dir":1},
+    {"pos":pg.Vector2(2200,350),"rect":pg.Rect(0,0,40,40), "start":2200,"dir":1},
+    {"pos":pg.Vector2(3250,400),"rect":pg.Rect(0,0,40,40),"start":3250,"dir":1}
 ]
 
 
@@ -61,7 +65,16 @@ while running:
     if keys[pg.K_d] and keys[pg.K_LSHIFT]:
             player.x+=350*dt
 
+    
 
+    if keys[pg.K_m] and bullet.y>0:
+         screen_bullet=bullet.move(-camera_x,0)
+         pg.draw.rect(screen,"blue",screen_bullet)
+         bullet.x=player.centerx
+         bullet.y=player.centery
+         bullet.x+=bullet_speed*dt*bullet_dir
+         if bullet.x<=player.center.x-500:
+              bullet.y=1000
     #movement
     movingPlatform1.y+=platform_speed*platform_dir*dt
 
@@ -150,8 +163,9 @@ while running:
 
     for enemy in enemies:
         screen_enemy=enemy["pos"]-pg.Vector2(camera_x,0)
-        pg.draw.circle(screen,"red",screen_enemy,40)
+        pg.draw.circle(screen,"red",screen_enemy,20)
 
+    
   
     pg.display.flip()
     dt=clock.tick(60)/1000
