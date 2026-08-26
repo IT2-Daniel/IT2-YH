@@ -25,6 +25,9 @@ enemy_hp=2
 bullet_speed=500
 bullet_dir=1
 bullet=pg.Rect(player.centerx,player.centery,50,15)
+shooting=False
+bullet_StartX=0
+bullet_range=1000
 
 
 platforms = [
@@ -38,9 +41,9 @@ platforms = [
 ]
 
 enemies=[
-    {"pos":pg.Vector2(825,400),"rect":pg.Rect(0,0,40,40), "start":825,"dir":1},
-    {"pos":pg.Vector2(2200,350),"rect":pg.Rect(0,0,40,40), "start":2200,"dir":1},
-    {"pos":pg.Vector2(3250,400),"rect":pg.Rect(0,0,40,40),"start":3250,"dir":1}
+    {"pos":pg.Vector2(825,400),"rect":pg.Rect(0,0,40,40), "start":825,"dir":1,"hp":2},
+    {"pos":pg.Vector2(2200,350),"rect":pg.Rect(0,0,40,40), "start":2200,"dir":1,"hp":2},
+    {"pos":pg.Vector2(3250,400),"rect":pg.Rect(0,0,40,40),"start":3250,"dir":1,"hp":2}
 ]
 
 
@@ -67,14 +70,23 @@ while running:
 
     
 
-    if keys[pg.K_m] and bullet.y>0:
-         screen_bullet=bullet.move(-camera_x,0)
-         pg.draw.rect(screen,"blue",screen_bullet)
-         bullet.x=player.centerx
-         bullet.y=player.centery
-         bullet.x+=bullet_speed*dt*bullet_dir
-         if bullet.x<=player.center.x-500:
-              bullet.y=1000
+    if keys[pg.K_m] and not shooting:
+        shooting = True
+        bullet.x = player.right
+        bullet.y = player.centery
+        bullet_startX = player.right
+
+    if shooting:
+        bullet.x += bullet_speed * dt * bullet_dir
+
+        if bullet.x >= bullet_startX + bullet_range:
+            shooting = False
+            bullet.y = 1000
+
+        screen_bullet = bullet.move(-camera_x, 0)
+        pg.draw.rect(screen, "blue", screen_bullet)
+
+
     #movement
     movingPlatform1.y+=platform_speed*platform_dir*dt
 
@@ -135,10 +147,23 @@ while running:
             player.bottom = movingPlatform1.top
             vel_y = 0
 
+
+    
+
+    
+
     for enemy in enemies:
-         if enemy["rect"].colliderect(player) and IFrames<=0:
-              hp-=1
-              IFrames=1
+        if enemy["hp"] > 0:
+
+            if enemy["rect"].colliderect(bullet):
+                enemy["hp"] -= 1
+                bullet.y = 1000
+                shooting = False
+
+            if enemy["rect"].colliderect(player) and IFrames <= 0:
+                hp -= 1
+                IFrames = 1
+        
 
     if IFrames>0:
          IFrames-=dt
@@ -163,7 +188,11 @@ while running:
 
     for enemy in enemies:
         screen_enemy=enemy["pos"]-pg.Vector2(camera_x,0)
-        pg.draw.circle(screen,"red",screen_enemy,20)
+        if enemy["hp"]>0:
+            pg.draw.circle(screen,"red",screen_enemy,20)
+        else:
+             pg.draw.circle(screen,"white",screen_enemy,20)
+
 
     
   
