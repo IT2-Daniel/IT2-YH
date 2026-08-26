@@ -41,9 +41,9 @@ platforms = [
 ]
 
 enemies=[
-    {"pos":pg.Vector2(825,400),"rect":pg.Rect(0,0,40,40), "start":825,"dir":1,"hp":2},
-    {"pos":pg.Vector2(2200,350),"rect":pg.Rect(0,0,40,40), "start":2200,"dir":1,"hp":2},
-    {"pos":pg.Vector2(3250,400),"rect":pg.Rect(0,0,40,40),"start":3250,"dir":1,"hp":2}
+    {"pos":pg.Vector2(825,450),"rect":pg.Rect(0,0,40,40), "start":825,"dir":1,"hp":2},
+    {"pos":pg.Vector2(2200,400),"rect":pg.Rect(0,0,40,40), "start":2200,"dir":1,"hp":2},
+    {"pos":pg.Vector2(3250,450),"rect":pg.Rect(0,0,40,40),"start":3250,"dir":1,"hp":2}
 ]
 
 
@@ -70,7 +70,7 @@ while running:
 
     
 
-    if keys[pg.K_m] and not shooting:
+    if keys[pg.K_e] and not shooting:
         shooting = True
         bullet.x = player.right
         bullet.y = player.centery
