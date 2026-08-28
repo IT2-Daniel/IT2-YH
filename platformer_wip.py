@@ -28,6 +28,21 @@ bullet=pg.Rect(player.centerx,player.centery,50,15)
 shooting=False
 bullet_StartX=0
 bullet_range=1000
+Boss_hp=15
+boss=pg.Rect(4200,200,100,500)
+Jump_power=-550
+#boss=pg.rect()
+
+
+boss_bullets=[
+    pg.Rect(boss.x,boss.y,50,15),
+    pg.Rect(boss.x,boss.y,50,15),
+    pg.Rect(boss.x,boss.y,50,15),
+    pg.Rect(boss.x,boss.y,50,15),
+    pg.Rect(boss.x,boss.y,50,15),
+    pg.Rect(boss.x,boss.y,50,15),
+    pg.Rect(boss.x,boss.y,50,15)
+]
 
 
 platforms = [
@@ -37,6 +52,10 @@ platforms = [
     pg.Rect(2000, 450, 400, 50),
     pg.Rect(2500, 350, 300, 50),
     pg.Rect(3000, 500, 500, 50),
+    pg.Rect(4000, 200, 400, 50),
+    pg.Rect(3700, 350, 300, 50),
+    pg.Rect(4000, 500, 500, 50),
+
     
 ]
 
@@ -61,7 +80,7 @@ while running:
     if keys[pg.K_d]:
         player.x+=300*dt
     if keys[pg.K_SPACE] and vel_y==0:
-        vel_y=-500
+        vel_y=Jump_power
 
     if keys[pg.K_a] and keys[pg.K_LSHIFT]:
             player.x-=350*dt
@@ -149,8 +168,8 @@ while running:
             player.bottom = movingPlatform1.top
             vel_y = 0
 
-
     
+        
 
     
 
