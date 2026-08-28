@@ -134,6 +134,8 @@ while running:
         vel_y=0    
         hp=3
         IFrames=1
+        for enemy in enemies:
+             enemy["hp"]=2
         continue 
 
     for platform in platforms:
