@@ -1,4 +1,5 @@
 import pygame as pg
+import random as r
 
 #setup
 pg.init()
@@ -8,7 +9,7 @@ running=True
 dt=0
 gravity=1000
 vel_y=0
-position=pg.Vector2(screen.get_width()/2, screen.get_height()/2)
+position=pg.Vector2(100, 500)
 player=pg.Rect(position.x ,position.y,80,80)
 camera_x=player.x
 movingPlatform1=pg.Rect(1100, 400, 250, 50)
@@ -23,26 +24,30 @@ spawnX=100
 spawnY=500
 enemy_hp=2
 bullet_speed=500
+boss_shottimer=0
+boss_shotdelay=0.5
 bullet_dir=1
 bullet=pg.Rect(player.centerx,player.centery,50,15)
 shooting=False
 bullet_StartX=0
 bullet_range=1000
 Boss_hp=15
-boss=pg.Rect(4200,200,100,500)
+boss=pg.Rect(4700,100,100,500)
 Jump_power=-550
+won=False
 #boss=pg.rect()
 
 
-boss_bullets=[
-    pg.Rect(boss.x,boss.y,50,15),
-    pg.Rect(boss.x,boss.y,50,15),
-    pg.Rect(boss.x,boss.y,50,15),
-    pg.Rect(boss.x,boss.y,50,15),
-    pg.Rect(boss.x,boss.y,50,15),
-    pg.Rect(boss.x,boss.y,50,15),
-    pg.Rect(boss.x,boss.y,50,15)
-]
+boss_bullets=[]
+for i in range(15):
+    boss_bullets.append(pg.Rect(0,1000,50,15))
+    # pg.Rect(boss.x,boss.y,50,15),
+    #pg.Rect(boss.x,boss.y,50,15),
+    #pg.Rect(boss.x,boss.y,50,15),
+    #pg.Rect(boss.x,boss.y,50,15),
+    #pg.Rect(boss.x,boss.y,50,15),
+    #pg.Rect(boss.x,boss.y,50,15)
+
 
 
 platforms = [
@@ -81,11 +86,16 @@ while running:
         player.x+=300*dt
     if keys[pg.K_SPACE] and vel_y==0:
         vel_y=Jump_power
+    if keys[pg.K_s] and vel_y!=0:
+         vel_y=500
 
     if keys[pg.K_a] and keys[pg.K_LSHIFT]:
             player.x-=350*dt
     if keys[pg.K_d] and keys[pg.K_LSHIFT]:
             player.x+=350*dt
+
+    if keys[pg.K_r]:
+         hp=0
 
     
 
@@ -105,6 +115,12 @@ while running:
         screen_bullet = bullet.move(-camera_x, 0)
         pg.draw.rect(screen, "blue", screen_bullet)
 
+    # boss bullets
+    for boss_bullet in boss_bullets:
+        if boss_bullet.y < 1000:
+            screen_boss_bullet = boss_bullet.move(-camera_x, 0)
+            pg.draw.rect(screen, "red", screen_boss_bullet)
+
 
     #movement
     movingPlatform1.y+=platform_speed*platform_dir*dt
@@ -114,6 +130,24 @@ while running:
 
     if movingPlatform1.y<=100:
         platform_dir= 1
+
+    boss_shottimer += dt
+
+    if boss_shottimer >= boss_shotdelay and Boss_hp>0:
+        boss_shottimer = 0
+
+        for boss_bullet in boss_bullets:
+            if boss_bullet.y >= 1000:
+                boss_bullet.x = boss.left
+                boss_bullet.y = r.randint(boss.top+100, boss.bottom - boss_bullet.height)
+                break
+
+    for boss_bullet in boss_bullets:
+        if boss_bullet.y < 1000:
+            boss_bullet.x -= bullet_speed * dt
+            
+        if boss_bullet.x < boss.x - 700:
+            boss_bullet.y = 1000
 
  
 
@@ -153,9 +187,10 @@ while running:
         vel_y=0    
         hp=3
         IFrames=1
+        Boss_hp=15
         for enemy in enemies:
              enemy["hp"]=2
-        continue 
+             continue 
 
     for platform in platforms:
         if player.colliderect(platform):
@@ -184,6 +219,12 @@ while running:
             if enemy["rect"].colliderect(player) and IFrames <= 0:
                 hp -= 1
                 IFrames = 1
+
+    for boss_bullet in boss_bullets:
+        if boss_bullet.colliderect(player) and IFrames <= 0:
+            hp -= 1
+            IFrames = 1
+            boss_bullet.y = 1000
         
 
     if IFrames>0:
@@ -212,10 +253,25 @@ while running:
         if enemy["hp"]>0:
             pg.draw.circle(screen,"red",screen_enemy,20)
         else:
-             pg.draw.circle(screen,"white",screen_enemy,20)
+             pg.draw.circle(screen,"white",screen_enemy,20) 
 
 
+    screen_boss=boss.move(-camera_x,0)
+    pg.draw.rect(screen,"red",screen_boss)
+
+    if Boss_hp > 0:
     
+                if boss.colliderect(bullet):
+                    Boss_hp -= 1
+                    bullet.y = 1000
+                    shooting = False
+
+    if Boss_hp<=0:
+         pg.draw.rect(screen,"white",screen_boss)
+         if not won:
+            won=True
+            print("du vant")
+         
   
     pg.display.flip()
     dt=clock.tick(60)/1000
