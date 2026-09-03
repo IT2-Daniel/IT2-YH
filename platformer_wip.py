@@ -240,7 +240,7 @@ while running:
 
     screen_movingPlatform1=movingPlatform1.move(-camera_x,0)
     pg.draw.rect(screen,"white", screen_movingPlatform1)
-    
+        
     screen_player=player.move(-camera_x,0)
     if IFrames<=0:
         
