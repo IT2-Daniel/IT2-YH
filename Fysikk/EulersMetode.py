@@ -1,12 +1,14 @@
-a=-9.81 #startakselerasjon
-s=20#startposisjon
+a=20 #startakselerasjon
+s=0#startposisjon
 t=0 #starttid
-v0=125 #startfart
+v0=0 #startfart
 dt=0.001 #tidsintervall
-tf=2.3 #sluttid
+tf=2.5 #sluttid
 
-while s>=0: #endre fart, posisjon og tid
-    a=-9.81 
+
+
+while t<=10: #endre fart, posisjon og tid
+    a=20
     v0=v0+a*dt
     s=s+v0*dt
     t=t+dt

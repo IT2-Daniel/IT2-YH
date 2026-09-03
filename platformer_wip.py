@@ -139,7 +139,7 @@ while running:
         for boss_bullet in boss_bullets:
             if boss_bullet.y >= 1000:
                 boss_bullet.x = boss.left
-                boss_bullet.y = r.randint(boss.top+100, boss.bottom - boss_bullet.height)
+                boss_bullet.y = r.randint(boss.top+75, boss.bottom - boss_bullet.height)
                 break
 
     for boss_bullet in boss_bullets:
@@ -240,7 +240,7 @@ while running:
 
     screen_movingPlatform1=movingPlatform1.move(-camera_x,0)
     pg.draw.rect(screen,"white", screen_movingPlatform1)
-        
+
     screen_player=player.move(-camera_x,0)
     if IFrames<=0:
         
