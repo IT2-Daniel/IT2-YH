@@ -1,15 +1,15 @@
-a=0.6 #startakselerasjon
-s=0#startfart
+a=-9.81 #startakselerasjon
+s=20#startposisjon
 t=0 #starttid
-v0=4.5 #startfart
-dt=0.0001 #tidsintervall
+v0=125 #startfart
+dt=0.001 #tidsintervall
 tf=2.3 #sluttid
 
-while t<=tf: #endre fart, posisjon og tid
-    a=0.6 
-    v0+=a*dt
-    s+=v0*dt
-    t+=dt
+while s>=0: #endre fart, posisjon og tid
+    a=-9.81 
+    v0=v0+a*dt
+    s=s+v0*dt
+    t=t+dt
 
 print(f"sluttid = {round(t,2)} sekunder" )
 print(f"sluttposisjon = {round(s,2)} meter" )
