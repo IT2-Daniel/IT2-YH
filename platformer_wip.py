@@ -35,6 +35,7 @@ Boss_hp=15
 boss=pg.Rect(4700,100,100,500)
 Jump_power=-550
 won=False
+font = pg.font.Font(None, 50)
 #boss=pg.rect()
 
 
@@ -225,8 +226,42 @@ while running:
             hp -= 1
             IFrames = 1
             boss_bullet.y = 1000
-        
 
+
+    # Player HP
+    
+    for i in range(3):
+        if i < hp:
+            heart_color = "red"
+        else:
+            heart_color = "gray"
+
+        pg.draw.circle(screen, heart_color, (40 + i * 45, 40), 15)
+        pg.draw.circle(screen, heart_color, (55 + i * 45, 40), 15)
+        pg.draw.polygon(screen, heart_color, [
+            (25 + i * 45, 45),
+            (70 + i * 45, 45),
+            (47 + i * 45, 75)
+        ])       
+
+        # Boss HP bar
+    bar_x = 400
+    bar_y = 30
+    bar_width = 480
+    bar_height = 30
+
+    # Hele baren (bakgrunn)
+    pg.draw.rect(screen, "gray", (bar_x, bar_y, bar_width, bar_height))
+
+    # Hvor mye av baren som skal være rød
+    boss_hp_width = bar_width * Boss_hp / 15
+
+    pg.draw.rect(screen, "red", (
+        bar_x,
+        bar_y,
+        boss_hp_width,
+        bar_height
+    ))
     if IFrames>0:
          IFrames-=dt
 
