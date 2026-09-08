@@ -16,6 +16,7 @@ movingPlatform1=pg.Rect(1100, 400, 250, 50)
 platform_speed=200
 platform_dir=1
 hp=3
+max_hp=3
 enemy_speed=150
 enemy_dir=1
 enemy_range=300
@@ -36,7 +37,33 @@ boss=pg.Rect(4700,100,100,500)
 Jump_power=-550
 won=False
 font = pg.font.Font(None, 50)
-#boss=pg.rect()
+bs_cd=0
+phase=1
+bs_warn=0
+
+
+
+
+
+
+
+bsl=[
+pg.Rect(4000,400,25,100),
+pg.Rect(4000,250,25,100),
+pg.Rect(4400,600,110,25),
+pg.Rect(4225,600,110,25),
+pg.Rect(4050,600,110,25)
+
+]
+
+randombs = r.sample(bsl, 2)
+
+randombs=[]
+
+
+bs_warnt=2
+bs_coold=3
+bs_atk=False 
 
 
 boss_bullets=[]
@@ -58,7 +85,6 @@ platforms = [
     pg.Rect(2000, 450, 400, 50),
     pg.Rect(2500, 350, 300, 50),
     pg.Rect(3000, 500, 500, 50),
-    pg.Rect(4000, 200, 400, 50),
     pg.Rect(3700, 350, 300, 50),
     pg.Rect(4000, 500, 500, 50),
 
@@ -140,7 +166,7 @@ while running:
         for boss_bullet in boss_bullets:
             if boss_bullet.y >= 1000:
                 boss_bullet.x = boss.left
-                boss_bullet.y = r.randint(boss.top+75, boss.bottom - boss_bullet.height)
+                boss_bullet.y = r.randint(boss.top+75, boss.bottom-75 - boss_bullet.height)
                 break
 
     for boss_bullet in boss_bullets:
@@ -182,13 +208,16 @@ while running:
         hp=0
 
     if hp<=0:
+        bullet.y=1000
         print("respawning")
         player.x=spawnX
         player.y=spawnY    
         vel_y=0    
         hp=3
         IFrames=1
-        Boss_hp=15
+        Boss_hp=1
+        won=False
+        phase=1
         for enemy in enemies:
              enemy["hp"]=2
              continue 
@@ -230,7 +259,7 @@ while running:
 
     # Player HP
     
-    for i in range(3):
+    for i in range(max_hp):
         if i < hp:
             heart_color = "red"
         else:
@@ -244,16 +273,18 @@ while running:
             (47 + i * 45, 75)
         ])       
 
+      
+
         # Boss HP bar
     bar_x = 400
     bar_y = 30
     bar_width = 480
     bar_height = 30
 
-    # Hele baren (bakgrunn)
+    
     pg.draw.rect(screen, "gray", (bar_x, bar_y, bar_width, bar_height))
 
-    # Hvor mye av baren som skal være rød
+    
     boss_hp_width = bar_width * Boss_hp / 15
 
     pg.draw.rect(screen, "red", (
@@ -272,6 +303,29 @@ while running:
     for platform in platforms:
         screen_platform=platform.move(-camera_x,0)
         pg.draw.rect(screen,"white",screen_platform)
+
+    #for bs in bsl:
+        #screen_bs=bs.move(-camera_x,0)
+        #pg.draw.rect(screen,"white",screen_bs)
+    
+
+    if phase==2:
+        bs_cd+=dt
+        if bs_cd>=bs_coold and not bs_atk:
+            bs_cd=0
+        
+            randombs=r.sample(bsl,2)
+            bs_warn=0
+            bs_atk=True
+        if bs_atk==True:
+            bs_warn+=dt
+            for bs in randombs:
+                screen_bs=bs.move(-camera_x,0)  
+                pg.draw.rect(screen,"red",screen_bs)
+
+            if bs_warn>=bs_warnt:
+                #Fikse bullets
+                bs_atk=False
 
     screen_movingPlatform1=movingPlatform1.move(-camera_x,0)
     pg.draw.rect(screen,"white", screen_movingPlatform1)
@@ -304,9 +358,26 @@ while running:
     if Boss_hp<=0:
          pg.draw.rect(screen,"white",screen_boss)
          if not won:
+            max_hp=5
+            hp=max_hp
+            IFrames=2.5
+            for i in range(max_hp):
+                if i < hp:
+                    heart_color = "red"
+                else:
+                    heart_color = "gray"
+        
+                pg.draw.circle(screen, heart_color, (70 + i * 45, 40), 15)
+                pg.draw.polygon(screen, heart_color, [
+                    (25 + i * 45, 45),
+                    (70 + i * 45, 45),
+                    (47 + i * 45, 75)
+                ])
+            phase+=1
+            bs_cd=5
             won=True
             print("du vant")
-         
+                   
   
     pg.display.flip()
     dt=clock.tick(60)/1000
