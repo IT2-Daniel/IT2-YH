@@ -40,6 +40,10 @@ font = pg.font.Font(None, 50)
 bs_cd=0
 phase=1
 bs_warn=0
+bs_shootcd = 0
+bs_shootdelay = 0.1
+bs_shots = 20
+bs_shotsfired = 0
 
 
 
@@ -75,6 +79,14 @@ for i in range(15):
     #pg.Rect(boss.x,boss.y,50,15),
     #pg.Rect(boss.x,boss.y,50,15),
     #pg.Rect(boss.x,boss.y,50,15)
+
+bs_bullets=[]
+bs_bullet_vel=[]
+for i in range(100):
+    bs_bullets.append(pg.Rect(0,2000,15,15))
+    bs_bullet_vel.append(pg.Vector2(0,0))
+
+
 
 
 
@@ -215,7 +227,7 @@ while running:
         vel_y=0    
         hp=3
         IFrames=1
-        Boss_hp=1
+        Boss_hp=15
         won=False
         phase=1
         for enemy in enemies:
@@ -233,7 +245,7 @@ while running:
             player.bottom = movingPlatform1.top
             vel_y = 0
 
-    
+  
         
 
     
@@ -309,23 +321,90 @@ while running:
         #pg.draw.rect(screen,"white",screen_bs)
     
 
-    if phase==2:
-        bs_cd+=dt
-        if bs_cd>=bs_coold and not bs_atk:
-            bs_cd=0
+    if phase == 2 and Boss_hp>0:
         
-            randombs=r.sample(bsl,2)
-            bs_warn=0
-            bs_atk=True
-        if bs_atk==True:
-            bs_warn+=dt
-            for bs in randombs:
-                screen_bs=bs.move(-camera_x,0)  
-                pg.draw.rect(screen,"red",screen_bs)
+        boss_shotdelay=1.25
+    
+        
 
-            if bs_warn>=bs_warnt:
-                #Fikse bullets
-                bs_atk=False
+        bs_cd += dt
+
+        # Velg to angrepssteder
+        if bs_cd >= bs_coold and not bs_atk:
+            bs_cd = 0
+            randombs = r.sample(bsl, 2)
+            bs_warn = 0
+            bs_shootcd = 0
+            bs_shotsfired = 0
+            bs_atk = True
+
+        if bs_atk:
+
+            bs_warn += dt
+
+            # Tegn røde warning-områder
+            for bs in randombs:
+                screen_bs = bs.move(-camera_x, 0)
+                pg.draw.rect(screen, "red", screen_bs)
+
+            # WARNING FERDIG → begynn å skyte
+            if bs_warn >= bs_warnt:
+
+                bs_shootcd += dt
+
+                if bs_shootcd >= bs_shootdelay:
+
+                    bs_shootcd = 0
+
+                    for bs in randombs:
+
+                        for i, bs_bullet in enumerate(bs_bullets):
+
+                            # Finn en ledig kule
+                            if bs_bullet.y >= 2000:
+
+                                # Skyter oppover
+                                if bs.top >= 500:
+                                    bs_bullet.x = r.randint(bs.left, bs.right)
+                                    bs_bullet.y = bs.top
+                                    bs_bullet_vel[i] = pg.Vector2(0, -500)
+
+                                # Skyter mot høyre
+                                else:
+                                    bs_bullet.x = bs.right
+                                    bs_bullet.y = r.randint(bs.top, bs.bottom)
+                                    bs_bullet_vel[i] = pg.Vector2(500, 0)
+
+                                bs_shotsfired += 1
+                                break
+
+                # Ferdig med å skyte
+                if bs_shotsfired >= bs_shots:
+                    bs_shotsfired = 0
+                    bs_shootcd = 0
+                    bs_atk = False
+    if phase==1:
+        boss_shotdelay=0.5
+
+
+    # Flytt og tegn aktive Phase-2-kuler
+    for i, bs_bullet in enumerate(bs_bullets):
+
+        if bs_bullet.y < 2000:
+
+            bs_bullet.x += bs_bullet_vel[i].x * dt
+            bs_bullet.y += bs_bullet_vel[i].y * dt
+
+            screen_bs_bullet = bs_bullet.move(-camera_x, 0)
+            pg.draw.rect(screen, "orange", screen_bs_bullet)
+
+            if bs_bullet.colliderect(player) and IFrames<=0:
+                hp-=1
+                IFrames=1
+
+            # Fjern kule når den har forlatt området
+            if bs_bullet.x > 5000 or bs_bullet.y < 0:
+                bs_bullet.y = 2000
 
     screen_movingPlatform1=movingPlatform1.move(-camera_x,0)
     pg.draw.rect(screen,"white", screen_movingPlatform1)
@@ -355,12 +434,23 @@ while running:
                     bullet.y = 1000
                     shooting = False
 
+    if keys[pg.K_n]:
+        phase=1
+        Boss_hp=15
+        hp=3
+    if keys[pg.K_m]:
+        phase=2
+        Boss_hp=15
+        hp=5
+
     if Boss_hp<=0:
          pg.draw.rect(screen,"white",screen_boss)
          if not won:
             max_hp=5
             hp=max_hp
             IFrames=2.5
+            Boss_hp=15
+    
             for i in range(max_hp):
                 if i < hp:
                     heart_color = "red"
