@@ -44,6 +44,9 @@ bs_shootcd = 0
 bs_shootdelay = 0.1
 bs_shots = 20
 bs_shotsfired = 0
+shield=pg.Rect(player.right-10,player.centery,25,90)
+shield_hp=3
+shield_regen=7
 
 
 
@@ -82,7 +85,7 @@ for i in range(15):
 
 bs_bullets=[]
 bs_bullet_vel=[]
-for i in range(100):
+for i in range(1000):
     bs_bullets.append(pg.Rect(0,2000,15,15))
     bs_bullet_vel.append(pg.Vector2(0,0))
 
@@ -138,7 +141,7 @@ while running:
 
     
 
-    if keys[pg.K_e] and not shooting:
+    if keys[pg.K_e] and not shooting and not shield_up:
         shooting = True
         bullet.x = player.right
         bullet.y = player.centery
@@ -248,7 +251,28 @@ while running:
   
         
 
-    
+    if keys[pg.K_q] and shield_hp>0:
+        shield_up=True
+        shield.x=player.right
+        shield.centery=player.centery
+        screen_shield=shield.move(-camera_x,0)
+        pg.draw.rect(screen,"green",screen_shield)
+        for boss_bullet in boss_bullets:
+            if shield.colliderect(boss_bullet):
+                boss_bullet.y=1000
+                shield_hp-=1
+                shield_regen=7
+    else:
+        shield_up=False
+
+    if shield_hp<3:
+        shield_regen-=dt
+        if shield_regen<=0:
+            shield_hp=3
+            shield_regen=7
+
+
+
 
     for enemy in enemies:
         if enemy["hp"] > 0:
@@ -442,6 +466,11 @@ while running:
         phase=2
         Boss_hp=15
         hp=5
+        bs_shots=1000
+        bs_cd=0
+        bs_shootdelay=0
+        bs_coold=0
+
 
     if Boss_hp<=0:
          pg.draw.rect(screen,"white",screen_boss)
