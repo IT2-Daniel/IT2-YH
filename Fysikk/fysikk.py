@@ -1,3 +1,5 @@
+
+
 v0=float(input())
 v=float(input())
 t=float(input())
