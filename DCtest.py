@@ -7,14 +7,16 @@ ground = Entity(
     model="cube",
     color=color.brown,
     scale=(2000, 1, 2000),
-    y=-1
+    y=-1,
+    collider="box"
 )
 
 player = Entity(
     model="cube",
     color=color.azure,
     scale_y=2,
-    position=(0, 0, 0)
+    position=(0, 0, 0),
+    collider="box"
 )
 
 # Camera
@@ -35,14 +37,40 @@ mouse.locked = True
 
 
 # Physics
-gravity = 0
+gravity = 20
 vel_y = 0
 
+
+
+def ground_collision():
+    hit =raycast(
+        player.position,
+        Vec3(0,-1,0),
+        distance=2,
+        ignore=[player]
+    )
+
+
+    if hit.hit and vel_y<=0:
+        player.y=hit.world_point.y+player.scale_y/2
+        return True
+    return False
 
 def update():
     global vel_y
     global camera_angle_y
     global camera_angle_x
+
+    on_ground=ground_collision()
+
+    vel_y -= gravity * time.dt
+    player.y += vel_y * time.dt
+
+    if on_ground:
+        vel_y=0
+
+    if player.y<0:
+        player.y=2
 
     # -----------------
     # CAMERA position
@@ -80,45 +108,38 @@ def update():
     # PHYSICS
     # -----------------
 
-    player_bottom = player.y - player.scale_y / 2
-    ground_top = ground.y + ground.scale_y / 2
 
-    vel_y -= gravity * time.dt
-    player.y += vel_y * time.dt
-
-    if player_bottom < ground_top:
-        player.y = ground_top + player.scale_y / 2
-        vel_y = 0
 
     # -----------------
     # PLAYER CONTROLS
     # -----------------
 
-    speed = 5 * time.dt
+    # Movement
 
-    if held_keys["w"]:
-        player.z += speed
+    speed=5
 
-    if held_keys["s"]:
-        player.z -= speed
+    movement = Vec3(
+        held_keys["d"] - held_keys["a"],
+        0,
+        held_keys["w"] - held_keys["s"]
+    )
 
-    if held_keys["a"]:
-        player.x -= speed
+    if movement.length() > 0:
+        movement = movement.normalized()
 
-    if held_keys["d"]:
-        player.x += speed
+    player.position += movement * speed * time.dt
 
+
+    # -----------------
+    # JUMP
+    # -----------------
 
 def input(key):
+
     global vel_y
 
-    if key == "space":
-
-        player_bottom = player.y - player.scale_y / 2
-        ground_top = ground.y + ground.scale_y / 2
-
-        if player_bottom <= ground_top:
-            vel_y = 8
+    if key == "space" and ground_collision():
+        vel_y = 80
 
     if key == "escape":
         mouse.locked = not mouse.locked
