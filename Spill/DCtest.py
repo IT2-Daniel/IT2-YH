@@ -1,11 +1,13 @@
 from ursina import *
 from math import *
 
+
 app = Ursina()
 
 ground = Entity(
     model="cube",
-    color=color.brown,
+    texture="grass",
+    texture_scale=(200,200),
     scale=(2000, 1, 2000),
     y=-1,
     collider="box"
@@ -18,6 +20,42 @@ player = Entity(
     position=(0, 0, 0),
     collider="box"
 )
+
+
+test=Entity(
+    model="cube",
+    color=color.orange,
+    scale=(10,10,10),
+    position=(20,0,20)
+)
+
+class enemy_war:
+    def __init__(self,x,y,z):
+        self.entity=Entity(
+            model="larsmedsverdblend1.glb",
+            position=(x,y,z),
+            scale=1
+            
+        )
+        self.x=x
+        self.y=y
+        self.z=z
+        self.hp=100
+        self.speed=7
+        self.damage=10
+
+    def move(self):
+        self.x+=self.speed
+
+enemy1=enemy_war(0,-6.414,10)
+enemy1.move()
+
+enemy2=enemy_war(10,-6.6414,10)
+enemy2.move()
+
+enemy3=enemy_war(20,-6.6414,10)
+enemy3.move()
+
 
 # Camera
 camera_distance = 15
@@ -76,8 +114,8 @@ def update():
     # CAMERA position
     # -----------------
     
-    camera_angle_y += mouse.velocity[0] * mouse_sens
-    camera_angle_x -= mouse.velocity[1] * mouse_sens
+    camera_angle_y -= mouse.velocity[0] * mouse_sens
+    camera_angle_x += mouse.velocity[1] * mouse_sens
 
     # Stop camera from going upside down
     camera_angle_x = clamp(
@@ -115,17 +153,26 @@ def update():
     # -----------------
 
     # Movement
-
     speed=5
 
-    movement = Vec3(
-        held_keys["d"] - held_keys["a"],
-        0,
-        held_keys["w"] - held_keys["s"]
+    if held_keys["shift"]:
+        speed=20
+    else:
+        speed=5
+
+
+    forward = Vec3(camera.forward.x, 0, camera.forward.z).normalized()
+    right = Vec3(camera.right.x, 0, camera.right.z).normalized()
+
+    movement = (
+        forward * (held_keys["w"] - held_keys["s"])
+        + right * (held_keys["d"] - held_keys["a"])
     )
 
     if movement.length() > 0:
         movement = movement.normalized()
+
+    
 
     player.position += movement * speed * time.dt
 
@@ -139,7 +186,7 @@ def input(key):
     global vel_y
 
     if key == "space" and ground_collision():
-        vel_y = 80
+        vel_y = 8
 
     if key == "escape":
         mouse.locked = not mouse.locked
