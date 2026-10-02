@@ -39,8 +39,8 @@ import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 
 # ---- FYLL INN DISSE TO ----
-CLIENT_ID = "b74ac65b9e294b439475ef24e4d4c39e"
-CLIENT_SECRET = "27cdbbd8aad14f049c463ead3bb0467c"
+CLIENT_ID = ""
+CLIENT_SECRET = ""
 # ----------------------------
 
 REDIRECT_URI = "http://127.0.0.1:8888/callback"

@@ -1,5 +1,5 @@
 from mendeleev import *
-from matplotlib import *
+from matplotlib.pyplot import *
 
 
 grunnstoff=["K","Ca","Sc","Ti","V","Cr","Mn","Fe","Co","Ni","Cu","Zn","Ga","Ge","As","Se","Br",]

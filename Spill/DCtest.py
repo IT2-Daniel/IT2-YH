@@ -47,7 +47,7 @@ class enemy_war:
     def move(self):
         self.x+=self.speed
 
-enemy1=enemy_war(0,-6.414,10)
+enemy1=enemy_war(0,-6.6414,10)
 enemy1.move()
 
 enemy2=enemy_war(10,-6.6414,10)
