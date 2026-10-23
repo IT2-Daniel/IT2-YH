@@ -13,13 +13,18 @@ ground = Entity(
     collider="box"
 )
 
-player = Entity(
-    model="cube",
-    color=color.azure,
-    scale_y=2,
-    position=(0, 0, 0),
-    collider="box"
-)
+
+
+
+
+#player = Entity(
+  #  model="cube",
+  #  color=color.azure,
+  #  scale_y=2,
+   # position=(0, 0, 0),
+   # collider="box"
+#)
+
 
 
 test=Entity(
@@ -29,7 +34,72 @@ test=Entity(
     position=(20,0,20)
 )
 
-class enemy_war:
+class Player:
+    def __init__(self,x,y,z):
+        self.entity=Entity(
+            model="Emilplayer.glb",
+            position=(x, y, z),
+            scale=0.2,
+            collider="box"
+        )
+
+        self.gravity=20
+        self.vel_y=0
+        self.speed=5
+
+    def ground_collision(self):
+        hit=raycast(
+            self.entity.position,
+            Vec3(0,-1,0),
+            distance=2,
+            ignore=[self.entity]
+    
+        )
+
+        if hit.hit and self.vel_y<=0:
+            self.entity.y=hit.world_point.y+self.entity.scale_y/2
+            return True
+
+        return False
+
+    def move(self):
+        speed=self.speed
+
+        if held_keys["shift"]:
+            speed=20
+
+        forward=Vec3(camera.forward.x,0,camera.forward.z).normalized()
+        right=Vec3(camera.right.x,0,camera.right.z).normalized()
+
+
+
+        movement=(
+            forward*(held_keys["w"]-held_keys["s"])
+            +right*(held_keys["d"]-held_keys["a"])
+        )
+
+        if movement.length()>0:
+            movement=movement.normalized()
+
+        self.entity.position+=movement*speed*time.dt
+
+    def update(self):
+        on_ground=self.ground_collision()
+
+        if on_ground and self.vel_y<0:
+            self.vel_y=0
+
+        self.vel_y-=self.gravity*time.dt
+        self.entity.y+=self.vel_y*time.dt
+
+        self.move()
+
+    def jump(self):
+        if self.ground_collision():
+            self.vel_y=8
+
+
+class Enemy_war:
     def __init__(self,x,y,z):
         self.entity=Entity(
             model="larsmedsverdblend1.glb",
@@ -45,16 +115,27 @@ class enemy_war:
         self.damage=10
 
     def move(self):
-        self.x+=self.speed
+        self.entity.x+=self.speed*time.dt
 
-enemy1=enemy_war(0,-6.6414,10)
-enemy1.move()
 
-enemy2=enemy_war(10,-6.6414,10)
-enemy2.move()
+player1 = Player(0,50,0)
 
-enemy3=enemy_war(20,-6.6414,10)
-enemy3.move()
+def update():
+    player1.update()
+
+def input(key):
+    if key=="space":
+        player1.jump()
+
+
+enemies=[
+Enemy_war(0,-6.6414,10),
+Enemy_war(10,-6.6414,10),
+Enemy_war(20,-6.6414,10)
+
+]
+
+
 
 
 # Camera
@@ -68,47 +149,25 @@ mouse_sens = 10
 
 
 
-
-camera.position = (0, camera_height, -camera_distance)
-
 mouse.locked = True
 
 
-# Physics
-gravity = 20
-vel_y = 0
 
 
 
-def ground_collision():
-    hit =raycast(
-        player.position,
-        Vec3(0,-1,0),
-        distance=2,
-        ignore=[player]
-    )
 
 
-    if hit.hit and vel_y<=0:
-        player.y=hit.world_point.y+player.scale_y/2
-        return True
-    return False
 
 def update():
-    global vel_y
-    global camera_angle_y
-    global camera_angle_x
+    global camera_angle_y,camera_angle_x
 
-    on_ground=ground_collision()
+    player1.update()
 
-    vel_y -= gravity * time.dt
-    player.y += vel_y * time.dt
+    for enemy in enemies:
+        enemy.move()
+  
 
-    if on_ground:
-        vel_y=0
 
-    if player.y<0:
-        player.y=2
 
     # -----------------
     # CAMERA position
@@ -131,65 +190,22 @@ def update():
     vertical_distance=sin(radians(camera_angle_x))*camera_distance
 
 
-    camera.position=player.position+Vec3(
+    camera.position=player1.entity.position+Vec3(
         sin(radians(camera_angle_y))*horizontal_distance,
         camera_height+vertical_distance,
         -cos(radians(camera_angle_y))*horizontal_distance
     )
     
-    camera.look_at(player.position+Vec3(0,1,0))
+    camera.look_at(player1.entity.position+Vec3(0,1,0))
     camera.rotation_z=0
 
 
-
-    # -----------------
-    # PHYSICS
-    # -----------------
-
-
-
-    # -----------------
-    # PLAYER CONTROLS
-    # -----------------
-
-    # Movement
-    speed=5
-
-    if held_keys["shift"]:
-        speed=20
-    else:
-        speed=5
-
-
-    forward = Vec3(camera.forward.x, 0, camera.forward.z).normalized()
-    right = Vec3(camera.right.x, 0, camera.right.z).normalized()
-
-    movement = (
-        forward * (held_keys["w"] - held_keys["s"])
-        + right * (held_keys["d"] - held_keys["a"])
-    )
-
-    if movement.length() > 0:
-        movement = movement.normalized()
-
-    
-
-    player.position += movement * speed * time.dt
-
-
-    # -----------------
-    # JUMP
-    # -----------------
-
 def input(key):
+    if key=="space":
+        player1.jump()
 
-    global vel_y
-
-    if key == "space" and ground_collision():
-        vel_y = 8
-
-    if key == "escape":
-        mouse.locked = not mouse.locked
+    if key=="escape":
+        mouse.locked=False
 
 
 app.run()

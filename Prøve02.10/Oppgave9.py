@@ -21,5 +21,12 @@ print(f"skjerm1:{vis_lager(skjerm1)}")
 print(f"mus2:{vis_lager(mus2)}")
 
 
-def selg_vare(lager,varenummer,antall):
+def selg_vare(lager:dict,varenummer:str,antall:int) -> bool:
+    if varenummer not in lager:
+        print(f"fant ingen vare med varenummer {varenummer}")
+        return False
+
+vare=lager[varenummer]
+
+if vare["antall"]<antall:
     
