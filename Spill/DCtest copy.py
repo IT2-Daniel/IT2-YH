@@ -50,7 +50,7 @@ class Player:
     def ground_collision(self):
         hit=raycast(
             self.entity.position,
-            Vec3(0,-1,0),
+            Vec3(0,-1,0), #lager vektorer i 3 dimensjoner for å håndtere posisjon og bevegelse i tredimensjonalt rom
             distance=2,
             ignore=[self.entity]
     
@@ -176,7 +176,7 @@ def update():
     camera_angle_y -= mouse.velocity[0] * mouse_sens
     camera_angle_x += mouse.velocity[1] * mouse_sens
 
-    # Stop camera from going upside down
+    # Stopper kamera fra å snus for langt
     camera_angle_x = clamp(
         camera_angle_x,
         -80,
