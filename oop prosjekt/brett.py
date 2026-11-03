@@ -1,0 +1,40 @@
+from rich_pixels import Pixels
+from rich.console import Console
+from rich.segment import Segment
+from rich.style import Style
+
+console = Console()
+
+grid = """ 
+ ...................................................
+ ...................................................
+ ..............vvvvvvvvvvvv.............................
+ ..............vggqqqvrrqqv.............................
+ ..............vvvqqqvqqqqv.............................
+ ..............vrrqqqqqrrqv.............................
+ ..............vvvvvvvvvvvv.............................
+ ...................................................
+
+
+"""
+
+
+mapping = {
+    "x": Segment(" ", Style.parse("white on #CC9966")),
+    "b": Segment(" ", Style.parse("white on #000000")),
+    "w": Segment(" ", Style.parse("white on #e6e6e6")),
+    "a": Segment(" ", Style.parse("white on #999999")),
+    "g": Segment(" ", Style.parse("white on #FFCC00")),
+    "h": Segment(" ", Style.parse("white on #663300")),
+    "q": Segment(" ", Style.parse("white on #666666")),
+    ".": Segment(" ", Style.parse("")),
+    "r": Segment(" ", Style.parse("white on #990000")),
+    "p": Segment(" ", Style.parse("white on #E6C299")),
+    "c": Segment(" ", Style.parse("white on #000066")),
+    "l": Segment(" ", Style.parse("white on #CC00FF")),
+    "v": Segment(" ", Style.parse("white on #333333"))
+}
+
+pixels = Pixels.from_ascii(grid, mapping)
+
+console.print(pixels)
