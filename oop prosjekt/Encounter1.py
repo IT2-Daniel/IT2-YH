@@ -38,6 +38,7 @@ grid = """
 """
 
 # Flytt den øverste figuren nedover
+#fått fra AI
 def move_down(grid, start_row, end_row, amount):
     rows = [list(row) for row in grid.splitlines()]
 

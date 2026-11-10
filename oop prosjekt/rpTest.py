@@ -28,6 +28,8 @@ grid = """
 
     
 """
+
+#Fått fra AI
 def move_right_down(grid, split_x, amount):
     rows = [list(row) for row in grid.splitlines()]
 
