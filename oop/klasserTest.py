@@ -27,6 +27,13 @@ class Character:
         return roll
 
 
+'''Character
+legger grunnlaget for de andre klassene og stter standarverdier for og definerer hp og basedamage
+og håndterer rng i spillet ved metoden roll
+
+'''
+
+
 class Player(Character):
     def __init__(self, hp, mp, speed, baseDamage, abilityDamageBase):
         super().__init__(hp, baseDamage)
@@ -38,14 +45,19 @@ class Player(Character):
         self.ability1 = None
         self.ability2 = None
 
+        self.items = ["Mana potion","Mana potion", "Health potion","Health potion"]
+
+    
+    
+
     def take_turn(self, enemy):
         print("\nDin tur!")
-        print("1: Base attack | 2: Abilities | 3: Run")
+        print("1: Base attack | 2: Abilities | 3: Run | 4: Items")
 
         try:
             valg = int(input("> "))
         except ValueError:
-            print("Ugyldig valg")
+            print("Ugyldig valg \n Du mister turen din som straff for denne enorme tabben")
             return True
 
         if valg == 1:
@@ -66,7 +78,7 @@ class Player(Character):
             try:
                 valgAbility = int(input("> "))
             except ValueError:
-                print("Ugyldig valg")
+                print("Ugyldig valg \n du mister turen din for denne enorme tabben")
                 return True
 
             if valgAbility == 1:
@@ -74,7 +86,7 @@ class Player(Character):
             elif valgAbility == 2:
                 name, cost, ability = self.ability2
             else:
-                print("Ugyldig valg")
+                print("Ugyldig valg \n du mister turen din")
                 return True
 
             if self.mp >= cost:
@@ -95,8 +107,43 @@ class Player(Character):
             print("-100 aura")
             return False
 
+        elif valg == 4:
+            if len(self.items) == 0:
+                print("Du har ingen items!")
+                return True
+
+            print("Dine items:")
+
+            for i in range(len(self.items)):
+                print(i + 1, self.items[i])
+
+            try:
+                valgItem = int(input("> "))
+            except ValueError:
+                print("Ugyldig valg \n du mister turen din")
+                return True
+
+            if valgItem < 1 or valgItem > len(self.items):
+                print("Ugyldig valg \n du mister turen din")
+                return True
+
+            item = self.items[valgItem - 1]
+
+            if item == "Mana potion":
+                if isinstance(self,Wizard):
+                    self.mp=20
+                else:
+                    self.mp = 10
+                    print("Du drikker en mana potion! Mana gjenopprettet.")
+
+            elif item == "Health potion":
+                self.hp += 50
+                print("Du drikker en health potion! +50 HP.")
+
+            self.items.pop(valgItem - 1)
+
         else:
-            print("Ugyldig valg")
+            print("Ugyldig valg \n du mister turen din")
 
         return True
 
@@ -124,7 +171,8 @@ class Wizard(Player):
         super().__init__(hp, mp, speed, baseDamage, abilityDamageBase)
 
         self.ability1 = ("Fireball", 3, self.fireball)
-        self.ability2 = ("Lightning Strike", 7, self.lightningStrike)
+        self.ability2 = ("Lightning Strike", 10, self.lightningStrike)
+        self.lightningUses=2
 
     def fireball(self):
         roll = self.roll()
@@ -132,9 +180,15 @@ class Wizard(Player):
         return damage
 
     def lightningStrike(self):
-        roll = self.roll()
-        damage = int(self.abilityDamageBase * 2 * roll / 10)
-        return damage
+        if self.lightningUses<=0:
+            print("du e tom for lightning")
+        else:
+            roll = self.roll()
+            damage = int(self.abilityDamageBase * 2.5 * roll / 10)
+            self.lightningUses-=1
+            return damage
+
+        
 
 
 class Enemy(Character):

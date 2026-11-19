@@ -87,9 +87,17 @@ vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
     input("\nTrykk Enter for å starte kampen...")
 
   
-    enemy = Enemy(60, 8)
+    enemies = [
+        Enemy(60, 8),
+        Enemy(40, 6),
+        Enemy(100, 12)
+    ]
 
-    start_combat(player, enemy)
+    for enemy in enemies:
+        start_combat(player, enemy)
+
+        if player.hp <= 0:
+            break
 
     input("\nTrykk Enter for å fortsette...")
     console.clear()

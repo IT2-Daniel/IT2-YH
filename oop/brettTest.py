@@ -70,7 +70,7 @@ def choose_class():
 
         elif valg == "2":
             print("Du valgte Wizard!")
-            return Wizard(80, 20, 7, 8, 25)
+            return Wizard(80, 20, 7, 2, 25)
 
         else:
             print("Ugyldig valg!")
